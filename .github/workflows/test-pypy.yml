@@ -1,0 +1,47 @@
+name: Validate PyPy
+on: [push, pull_request]
+
+jobs:
+# pypy-3.7-v7.3.3/
+# pypy-3.x-v7.x // NOTE THIS CASE; WILL FIXED FOR NOW/
+# pypy-3.6-v7.3.3/
+# pypy-2-v7.3.3
+
+# pypy-3.6-v7.3.2
+# pypy-3.6-v7.3.x
+# pypy-3.6-v7.x
+# pypy-3.6
+# pypy-3
+# pypy-2
+
+# pypy-3.6-nightly
+# pypy-3.7-nightly
+# pypy-3.6-v7.3.3-rc.1
+
+  setup-pypy-versions-from-manifest:
+    name: Setup ${{ matrix.pypy }} ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, windows-latest, ubuntu-16.04, ubuntu-18.04]
+        pypy: ['pypy-tag', 'pypy-3.17', 'pypy-3.x-7.6.x', 'pypy-3.7-v7.3.3', 'pypy-3.6-v7.3.3', 'pypy-3.6-v7.3.2', 'pypy-3.6-v7.3.3rc1', 'pypy-3.6-nightly', pypy-3.7-nightly, 'pypy-2-v7.3.3','pypy-3.7-v7.3.x', 'pypy-3.6-v7.3.x', 'pypy-3.x-v7.3.x', 'pypy-3.7-v7.x', 'pypy-3.x-v7.x', 'pypy-3.6-v7.3.x', 'pypy-3.6-v7.x', 'pypy-3.6', 'pypy-3', 'pypy-2', 'pypy-3.6-vx', 'pypy-3.7-vx', 'pypy-3.x-vx']
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: setup-python ${{ matrix.pypy }}
+      uses: ./
+      with:
+        python-version: ${{ matrix.pypy }}
+
+    - name: PyPy and Python version
+      run: python --version
+
+    - name: Run simple code
+      run: python -c 'import math; print(math.factorial(5))'
+
+    - name: Run simple code with pip package
+      run: | 
+        pip install arrow
+        python -c "import arrow; a = arrow.get('2013-05-11T21:23:58.970460+07:00'); print(a)"
