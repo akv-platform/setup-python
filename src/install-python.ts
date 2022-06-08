@@ -11,6 +11,93 @@ const MANIFEST_REPO_OWNER = 'actions';
 const MANIFEST_REPO_NAME = 'python-versions';
 const MANIFEST_REPO_BRANCH = 'main';
 export const MANIFEST_URL = `https://raw.githubusercontent.com/${MANIFEST_REPO_OWNER}/${MANIFEST_REPO_NAME}/${MANIFEST_REPO_BRANCH}/versions-manifest.json`;
+import os = require('os')
+import * as semver from 'semver'
+
+interface IToolReleaseFile {
+  filename: string
+  // 'aix', 'darwin', 'freebsd', 'linux', 'openbsd',
+  // 'sunos', and 'win32'
+  // platform_version is an optional semver filter
+  // TODO: do we need distribution (e.g. ubuntu).
+  //       not adding yet but might need someday.
+  //       right now, 16.04 and 18.04 work
+  platform: string
+  platform_version?: string
+
+  // 'arm', 'arm64', 'ia32', 'mips', 'mipsel',
+  // 'ppc', 'ppc64', 's390', 's390x',
+  // 'x32', and 'x64'.
+  arch: string
+
+  download_url: string
+}
+
+interface IToolRelease {
+  version: string
+  stable: boolean
+  release_url: string
+  files: IToolReleaseFile[]
+}
+
+async function _findMatch(
+  versionSpec: string,
+  stable: boolean,
+  candidates: IToolRelease[],
+  archFilter: string
+): Promise<IToolRelease | undefined> {
+  const platFilter = os.platform()
+
+  let result: IToolRelease | undefined
+  let match: IToolRelease | undefined
+
+  let file: IToolReleaseFile | undefined
+  for (const candidate of candidates) {
+    const version = candidate.version
+
+    core.debug(`check ${version} satisfies ${versionSpec}`)
+    if (
+      semver.satisfies(version, versionSpec) &&
+      (!stable || candidate.stable === stable)
+    ) {
+      file = candidate.files.find(item => {
+        core.debug(
+          `item.arch:${item.arch}===archFilter:${archFilter} && item.platform:${item.platform}===platFilter:${platFilter}`
+        )
+
+        let chk = item.arch === archFilter && item.platform === platFilter
+        core.debug(`chk = ${chk} item.platform_version = ${item.platform_version}`)
+        if (chk && item.platform_version) {
+          const osVersion = module.exports._getOsVersion()
+          core.debug(`osVersion = ${osVersion} item.platform_version = ${item.platform_version}`)
+
+          if (osVersion === item.platform_version) {
+            chk = true
+          } else {
+            chk = semver.satisfies(osVersion, item.platform_version)
+          }
+          core.debug(`chk2 = ${chk}`)
+        }
+
+        return chk
+      })
+
+      if (file) {
+        core.debug(`matched ${candidate.version}`)
+        match = candidate
+        break
+      }
+    }
+  }
+
+  if (match && file) {
+    // clone since we're mutating the file list to be only the file that matches
+    result = Object.assign({}, match)
+    result.files = [file]
+  }
+
+  return result
+}
 
 export async function findReleaseFromManifest(
   semanticVersionSpec: string,
@@ -22,7 +109,13 @@ export async function findReleaseFromManifest(
     AUTH,
     MANIFEST_REPO_BRANCH
   );
-  core.debug(`semanticVersionSpec=${semanticVersionSpec} manifest=${JSON.stringify(manifest)} architecture=${architecture}`)
+  // core.debug(`semanticVersionSpec=${semanticVersionSpec} manifest=${JSON.stringify(manifest)} architecture=${architecture}`)
+  await _findMatch(
+    semanticVersionSpec,
+    false,
+    manifest,
+    architecture
+  );
   return await tc.findFromManifest(
     semanticVersionSpec,
     false,
