@@ -64440,6 +64440,7 @@ exports.MANIFEST_URL = `https://raw.githubusercontent.com/${MANIFEST_REPO_OWNER}
 function findReleaseFromManifest(semanticVersionSpec, architecture) {
     return __awaiter(this, void 0, void 0, function* () {
         const manifest = yield tc.getManifestFromRepo(MANIFEST_REPO_OWNER, MANIFEST_REPO_NAME, AUTH, MANIFEST_REPO_BRANCH);
+        core.debug(`semanticVersionSpec=${semanticVersionSpec} manifest=${manifest} architecture=${architecture}`);
         return yield tc.findFromManifest(semanticVersionSpec, false, manifest, architecture);
     });
 }
