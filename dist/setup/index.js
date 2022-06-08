@@ -64137,6 +64137,7 @@ function useCpythonVersion(version, architecture) {
         if (!installDir) {
             core.info(`Version ${semanticVersionSpec} was not found in the local cache`);
             const foundRelease = yield installer.findReleaseFromManifest(semanticVersionSpec, architecture);
+            core.debug(`foundRelease = ${JSON.stringify(foundRelease)}`);
             if (foundRelease && foundRelease.files && foundRelease.files.length > 0) {
                 core.info(`Version ${semanticVersionSpec} is available for downloading`);
                 yield installer.installCpythonFromRelease(foundRelease);

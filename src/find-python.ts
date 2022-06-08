@@ -51,6 +51,7 @@ export async function useCpythonVersion(
       semanticVersionSpec,
       architecture
     );
+    core.debug(`foundRelease = ${JSON.stringify(foundRelease)}`)
 
     if (foundRelease && foundRelease.files && foundRelease.files.length > 0) {
       core.info(`Version ${semanticVersionSpec} is available for downloading`);
