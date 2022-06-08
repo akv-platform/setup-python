@@ -22,6 +22,7 @@ export async function findReleaseFromManifest(
     AUTH,
     MANIFEST_REPO_BRANCH
   );
+  core.debug(`semanticVersionSpec=${semanticVersionSpec} manifest=${manifest} architecture=${architecture}`)
   return await tc.findFromManifest(
     semanticVersionSpec,
     false,
