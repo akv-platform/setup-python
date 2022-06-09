@@ -64393,7 +64393,7 @@ exports.findAssetForMacOrLinux = findAssetForMacOrLinux;
 /***/ }),
 
 /***/ 2745:
-/***/ (function(module, exports, __nccwpck_require__) {
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
 
@@ -64441,6 +64441,19 @@ exports.MANIFEST_URL = `https://raw.githubusercontent.com/${MANIFEST_REPO_OWNER}
 const os = __nccwpck_require__(2037);
 const semver = __importStar(__nccwpck_require__(1383));
 const cp = __nccwpck_require__(2081);
+const fs = __nccwpck_require__(7147);
+function _readLinuxVersionFile() {
+    const lsbReleaseFile = '/etc/lsb-release';
+    const osReleaseFile = '/etc/os-release';
+    let contents = '';
+    if (fs.existsSync(lsbReleaseFile)) {
+        contents = fs.readFileSync(lsbReleaseFile).toString();
+    }
+    else if (fs.existsSync(osReleaseFile)) {
+        contents = fs.readFileSync(osReleaseFile).toString();
+    }
+    return contents;
+}
 function _getOsVersion() {
     // TODO: add windows and other linux, arm variants
     // right now filtering on version is only an ubuntu and macos scenario for tools we build for hosted (python)
@@ -64456,7 +64469,7 @@ function _getOsVersion() {
         // DISTRIB_RELEASE=18.04
         // DISTRIB_CODENAME=bionic
         // DISTRIB_DESCRIPTION="Ubuntu 18.04.4 LTS"
-        const lsbContents = module.exports._readLinuxVersionFile();
+        const lsbContents = _readLinuxVersionFile();
         if (lsbContents) {
             const lines = lsbContents.split('\n');
             for (const line of lines) {

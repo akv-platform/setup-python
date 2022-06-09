@@ -14,6 +14,7 @@ export const MANIFEST_URL = `https://raw.githubusercontent.com/${MANIFEST_REPO_O
 import os = require('os')
 import * as semver from 'semver'
 import cp = require('child_process')
+import fs = require('fs')
 
 interface IToolReleaseFile {
   filename: string
@@ -41,6 +42,19 @@ interface IToolRelease {
   files: IToolReleaseFile[]
 }
 
+function _readLinuxVersionFile(): string {
+  const lsbReleaseFile = '/etc/lsb-release'
+  const osReleaseFile = '/etc/os-release'
+  let contents = ''
+
+  if (fs.existsSync(lsbReleaseFile)) {
+    contents = fs.readFileSync(lsbReleaseFile).toString()
+  } else if (fs.existsSync(osReleaseFile)) {
+    contents = fs.readFileSync(osReleaseFile).toString()
+  }
+
+  return contents
+}
 function _getOsVersion(): string {
   // TODO: add windows and other linux, arm variants
   // right now filtering on version is only an ubuntu and macos scenario for tools we build for hosted (python)
@@ -56,7 +70,7 @@ function _getOsVersion(): string {
     // DISTRIB_RELEASE=18.04
     // DISTRIB_CODENAME=bionic
     // DISTRIB_DESCRIPTION="Ubuntu 18.04.4 LTS"
-    const lsbContents = module.exports._readLinuxVersionFile()
+    const lsbContents = _readLinuxVersionFile()
     if (lsbContents) {
       const lines = lsbContents.split('\n')
       for (const line of lines) {
