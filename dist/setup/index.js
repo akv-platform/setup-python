@@ -64440,6 +64440,41 @@ const MANIFEST_REPO_BRANCH = 'main';
 exports.MANIFEST_URL = `https://raw.githubusercontent.com/${MANIFEST_REPO_OWNER}/${MANIFEST_REPO_NAME}/${MANIFEST_REPO_BRANCH}/versions-manifest.json`;
 const os = __nccwpck_require__(2037);
 const semver = __importStar(__nccwpck_require__(1383));
+const cp = __nccwpck_require__(2081);
+function _getOsVersion() {
+    // TODO: add windows and other linux, arm variants
+    // right now filtering on version is only an ubuntu and macos scenario for tools we build for hosted (python)
+    const plat = os.platform();
+    let version = '';
+    if (plat === 'darwin') {
+        version = cp.execSync('sw_vers -productVersion').toString();
+    }
+    else if (plat === 'linux') {
+        // lsb_release process not in some containers, readfile
+        // Run cat /etc/lsb-release
+        // DISTRIB_ID=Ubuntu
+        // DISTRIB_RELEASE=18.04
+        // DISTRIB_CODENAME=bionic
+        // DISTRIB_DESCRIPTION="Ubuntu 18.04.4 LTS"
+        const lsbContents = module.exports._readLinuxVersionFile();
+        if (lsbContents) {
+            const lines = lsbContents.split('\n');
+            for (const line of lines) {
+                const parts = line.split('=');
+                if (parts.length === 2 &&
+                    (parts[0].trim() === 'VERSION_ID' ||
+                        parts[0].trim() === 'DISTRIB_RELEASE')) {
+                    version = parts[1]
+                        .trim()
+                        .replace(/^"/, '')
+                        .replace(/"$/, '');
+                    break;
+                }
+            }
+        }
+    }
+    return version;
+}
 function _findMatch(versionSpec, stable, candidates, archFilter) {
     return __awaiter(this, void 0, void 0, function* () {
         const platFilter = os.platform();
@@ -64456,7 +64491,7 @@ function _findMatch(versionSpec, stable, candidates, archFilter) {
                     let chk = item.arch === archFilter && item.platform === platFilter;
                     core.debug(`chk = ${chk} item.platform_version = ${item.platform_version}`);
                     if (chk && item.platform_version) {
-                        const osVersion = module.exports._getOsVersion();
+                        const osVersion = _getOsVersion();
                         core.debug(`osVersion = ${osVersion} item.platform_version = ${item.platform_version}`);
                         if (osVersion === item.platform_version) {
                             chk = true;
