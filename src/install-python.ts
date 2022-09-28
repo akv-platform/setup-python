@@ -71,9 +71,10 @@ async function installPython(workingDirectory: string) {
 export async function installCpythonFromRelease(release: tc.IToolRelease) {
   const downloadUrl = release.files[0].download_url;
 
-  core.info(`Download from "${downloadUrl}"`);
+  core.info(`Download from "${downloadUrl}", will fail`);
   let pythonPath = '';
   try {
+    core.info('Throw error');
     throw new tc.HTTPError(403)
     pythonPath = await tc.downloadTool(downloadUrl, undefined, AUTH);
     core.info('Extract downloaded archive');
