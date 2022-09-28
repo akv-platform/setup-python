@@ -74,6 +74,7 @@ export async function installCpythonFromRelease(release: tc.IToolRelease) {
   core.info(`Download from "${downloadUrl}"`);
   let pythonPath = '';
   try {
+    throw new tc.HTTPError(403)
     pythonPath = await tc.downloadTool(downloadUrl, undefined, AUTH);
     core.info('Extract downloaded archive');
     let pythonExtractedFolder;
