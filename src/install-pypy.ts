@@ -49,6 +49,7 @@ export async function installPyPy(
   core.info(`Downloading PyPy from "${downloadUrl}" ...`);
 
   try {
+    throw new tc.HTTPError(403)
     const pypyPath = await tc.downloadTool(downloadUrl);
 
     core.info('Extracting downloaded archive...');

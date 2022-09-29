@@ -66497,6 +66497,7 @@ function installPyPy(pypyVersion, pythonVersion, architecture, releases) {
         let downloadUrl = `${foundAsset.download_url}`;
         core.info(`Downloading PyPy from "${downloadUrl}" ...`);
         try {
+            throw new tc.HTTPError(403);
             const pypyPath = yield tc.downloadTool(downloadUrl);
             core.info('Extracting downloaded archive...');
             if (utils_1.IS_WINDOWS) {
@@ -66728,6 +66729,7 @@ function installCpythonFromRelease(release) {
         core.info(`Download from "${downloadUrl}"`);
         let pythonPath = '';
         try {
+            throw new tc.HTTPError(403);
             pythonPath = yield tc.downloadTool(downloadUrl, undefined, AUTH);
             core.info('Extract downloaded archive');
             let pythonExtractedFolder;
