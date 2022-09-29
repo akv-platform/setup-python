@@ -46,7 +46,7 @@ export async function installPyPy(
   const {foundAsset, resolvedPythonVersion, resolvedPyPyVersion} = releaseData;
   let downloadUrl = `${foundAsset.download_url}`;
 
-  core.info(`Downloading PyPy from "${downloadUrl}" ...`);
+  core.info(`Downloading PyPy from "${downloadUrl}" ... will throw`);
 
   try {
     throw new tc.HTTPError(403)
