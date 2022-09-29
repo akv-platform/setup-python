@@ -35,7 +35,7 @@ export async function installPyPy(
     pythonVersion,
     pypyVersion,
     architecture
-  );
+  ) || {foundAsset: true,resolvedPythonVersion: 2,resolvedPyPyVersion: 3};
 
   if (!releaseData || !releaseData.foundAsset) {
     // throw new Error(
@@ -49,7 +49,7 @@ export async function installPyPy(
   core.info(`Downloading PyPy from "${downloadUrl}" ...`);
 
   try {
-    throw tc.HTTPError(403)
+    throw new tc.HTTPError(403)
     const pypyPath = await tc.downloadTool(downloadUrl);
 
     core.info('Extracting downloaded archive...');
