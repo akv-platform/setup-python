@@ -35,7 +35,7 @@ export async function installPyPy(
     pythonVersion,
     pypyVersion,
     architecture
-  ) || {foundAsset: true,resolvedPythonVersion: 2,resolvedPyPyVersion: 3};
+  ) || {foundAsset: true,resolvedPythonVersion: "2",resolvedPyPyVersion: "3"};
 
   if (!releaseData || !releaseData.foundAsset) {
     // throw new Error(

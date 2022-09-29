@@ -66489,13 +66489,15 @@ function installPyPy(pypyVersion, pythonVersion, architecture, releases) {
         if (!releases || releases.length === 0) {
             throw new Error('No release was found in PyPy version.json');
         }
-        const releaseData = findRelease(releases, pythonVersion, pypyVersion, architecture);
+        const releaseData = findRelease(releases, pythonVersion, pypyVersion, architecture) || { foundAsset: true, resolvedPythonVersion: "2", resolvedPyPyVersion: "3" };
         if (!releaseData || !releaseData.foundAsset) {
-            throw new Error(`PyPy version ${pythonVersion} (${pypyVersion}) with arch ${architecture} not found`);
+            // throw new Error(
+            // `PyPy version ${pythonVersion} (${pypyVersion}) with arch ${architecture} not found`
+            //);
         }
         const { foundAsset, resolvedPythonVersion, resolvedPyPyVersion } = releaseData;
         let downloadUrl = `${foundAsset.download_url}`;
-        core.info(`Downloading PyPy from "${downloadUrl}" ... will throw`);
+        core.info(`Downloading PyPy from "${downloadUrl}" ...`);
         try {
             throw new tc.HTTPError(403);
             const pypyPath = yield tc.downloadTool(downloadUrl);
