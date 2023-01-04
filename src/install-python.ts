@@ -61,6 +61,8 @@ async function installPython(workingDirectory: string) {
     }
   };
 
+  core.debug('Exec options ' + JSON.stringify(options))
+
   if (IS_WINDOWS) {
     await exec.exec('powershell', ['./setup.ps1'], options);
   } else {
